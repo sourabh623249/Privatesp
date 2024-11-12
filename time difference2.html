@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Time Difference Calculator - Terminal Style</title>
+    <style>
+        /* Reset and basic styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: monospace;
+        }
+
+        /* Background and container styling */
+        body {
+            background-color: #0d0d0d;
+            color: #00ff00;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .container {
+            border: 2px solid #00ff00;
+            padding: 20px;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+            border-radius: 5px;
+        }
+
+        /* Title and ASCII Art Banner */
+        .banner {
+            margin-bottom: 15px;
+            font-size: 14px;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            margin: 10px 0;
+        }
+
+        /* Input and button styling */
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label, button, .result {
+            display: block;
+            margin: 10px 0;
+            font-size: 1rem;
+        }
+
+        input[type="text"] {
+            width: 60%;
+            padding: 8px;
+            color: #00ff00;
+            background-color: #333;
+            border: 2px solid #00ff00;
+            outline: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        select {
+            width: 35%;
+            padding: 8px;
+            color: #00ff00;
+            background-color: #333;
+            border: 2px solid #00ff00;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+
+        button {
+            background: #0d0d0d;
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            padding: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 48%;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background: #333;
+        }
+
+        /* Result display */
+        .result {
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+
+        /* Box around text and buttons */
+        .box {
+            border: 1px solid #00ff00;
+            padding: 10px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <!-- ASCII Banner -->
+    <div class="banner">
+        <pre>
+╔══════════════════════════════════════════════════╗
+             _____ ____  __  ______  ___    ____  __  __   
+            / ___// __ \/ / / / __ \/   |  / __ )/ / / /  
+            \__ \/ / / / / / / /_/ / /| | / __  / /_/ /    
+           ___/ / /_/ / /_/ / _, _/ ___ |/ /_/ / __  /   
+          /____/\____/\____/_/ |_/_/  |_/_____/_/ /_/      
+                                                 
+                      Calculator v2.0                       
+                    Created by Sourabh                       
+╚══════════════════════════════════════════════════╝
+        </pre>
+    </div>
+
+    <!-- Time Calculator Container -->
+    <div class="container">
+        <h2>Calculate Time Difference</h2>
+        
+        <!-- Start Time Input Fields -->
+        <div class="input-group">
+            <label for="start-time">Enter Start Time :</label>
+            <input type="text" id="start-time" placeholder="ENTER TIME">
+            <select id="start-period">
+                <option value="" disabled selected>Select</option>
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+            </select>
+        </div>
+
+        <!-- Stop Time Input Fields -->
+        <div class="input-group">
+            <label for="stop-time">Enter Stop Time :</label>
+            <input type="text" id="stop-time" placeholder="ENTER TIME">
+            <select id="stop-period">
+                <option value="" disabled selected>Select</option>
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+            </select>
+        </div>
+        
+        <!-- Buttons for calculation and copying -->
+        <div class="button-group">
+            <button onclick="calculateTime()">[ Calculate Difference ]</button>
+            <button onclick="copyResult()">[ Copy Results ]</button>
+        </div>
+        
+        <!-- Result box -->
+        <div class="box">
+            <div class="result" id="result">Total Duration: 0h 0m</div>
+        </div>
+    </div>
+
+    <script>
+        function calculateTime() {
+            const startTime = document.getElementById("start-time").value;
+            const stopTime = document.getElementById("stop-time").value;
+            const startPeriod = document.getElementById("start-period").value;
+            const stopPeriod = document.getElementById("stop-period").value;
+
+            if (!startTime || !stopTime) {
+                document.getElementById("result").innerText = "Please enter both start and stop times.";
+                return;
+            }
+
+            const [startHours, startMinutes] = startTime.split(":").map(Number);
+            const [stopHours, stopMinutes] = stopTime.split(":").map(Number);
+
+            if (isNaN(startHours) || isNaN(startMinutes) || isNaN(stopHours) || isNaN(stopMinutes)) {
+                document.getElementById("result").innerText = "Invalid time format. Use HH:MM.";
+                return;
+            }
+
+            let startDate = new Date(0, 0, 0, startHours % 12 + (startPeriod === "PM" ? 12 : 0), startMinutes);
+            let stopDate = new Date(0, 0, 0, stopHours % 12 + (stopPeriod === "PM" ? 12 : 0), stopMinutes);
+
+            let diff = stopDate - startDate;
+
+            if (diff < 0) {
+                diff += 24 * 60 * 60 * 1000;
+            }
+
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+            document.getElementById("result").innerText = `Total time: ${hours} hours and ${minutes} minutes`;
+        }
+
+        function copyResult() {
+            const resultText = document.getElementById("result").innerText;
+            navigator.clipboard.writeText(resultText).then(() => {
+                alert("Result copied to clipboard!");
+            }).catch(err => {
+                alert("Failed to copy result");
+            });
+        }
+    </script>
+</body>
+</html>
